@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./compose/app/Dockerfile
+    container_name: bootcamp-app
+    image: bootcamp-app
+    environment:
+      - REDIS_IP=cache
+      - REDIS_PORT=6379
+      - DB_HOST=postgres
+      - DATABASE=main
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - 8000
+
+  redis:
+    image: redis
+    container_name: bootcamp-redis
+    expose:
+      - 6379
+
+  postgres:
+    image: "postgres:latest"
+    container_name: bootcamp-postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:latest
+    container_name: bootcamp-nginx
+    build:
+      context: .
+      dockerfile: ./compose/nginx/Dockerfile
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    restart: "on-failure"
+
+volumes:
+  database_data:

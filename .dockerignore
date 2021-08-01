@@ -1,0 +1,6 @@
+.venv
+.dockerignore
+.git
+.gitignore
+.idea
+.pytest_cache
